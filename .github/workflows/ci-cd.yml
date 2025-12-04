@@ -23,8 +23,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: node-service/package-lock.json
 
       - name: Install dependencies
         working-directory: ./node-service
@@ -47,7 +45,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-node-results.sarif'
@@ -63,7 +61,6 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-          cache-dependency-path: go-service/go.sum
 
       - name: Run tests
         working-directory: ./go-service
@@ -82,7 +79,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: 'trivy-go-results.sarif'
@@ -101,21 +98,8 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Deploy Node.js service
+      - name: Deploy services
         run: |
-          echo "Deploying Node.js service to Kubernetes..."
-          # kubectl apply -f node-service/k8s/
-          echo "Node.js service deployed successfully"
-
-      - name: Deploy Go service
-        run: |
-          echo "Deploying Go service to Kubernetes..."
-          # kubectl apply -f go-service/k8s/
-          echo "Go service deployed successfully"
-
-      - name: Verify deployment
-        run: |
-          echo "Verifying deployment health..."
-          # kubectl wait --for=condition=ready pod -l app=node-service --timeout=60s
-          # kubectl wait --for=condition=ready pod -l app=go-service --timeout=60s
-          echo "Deployment verification complete"
+          echo "✅ Build and security scans passed!"
+          echo "Ready to deploy to Kubernetes cluster"
+          # Actual deployment would happen here with proper kubeconfig
